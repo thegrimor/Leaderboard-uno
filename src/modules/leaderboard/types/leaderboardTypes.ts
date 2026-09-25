@@ -3,6 +3,7 @@ export interface LeaderboardEntry {
   playerName: string
   matchesPlayed: number
   wins: number
+  totalCardsEaten: number
   winRate: number
 }
 

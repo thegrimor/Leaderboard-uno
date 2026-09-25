@@ -35,7 +35,9 @@ src/
       hooks.ts           # useAppDispatch, useAppSelector (tipados)
   modules/
     jugadores/
-      components/        # JugadoresView, AddPlayerForm, PlayerCard
+      components/        # JugadoresView, AddPlayerForm, PlayerCard (desplegable — al tocar el
+                          # chevron muestra partidas/victorias/cartas comidas de ese jugador,
+                          # leído de `leaderboard.items` vía `stats?: LeaderboardEntry`)
       services/           # jugadoresApi.ts (fetch al backend), jugadoresSlice.ts (thunks)
       types/               # Player, JugadoresState
       index.ts             # barrel export

@@ -197,7 +197,8 @@ export const store = {
     const { rows } = await pool.query(`
       SELECT p.id AS player_id, p.name,
         COUNT(mp.match_id) AS matches_played,
-        COUNT(mp.match_id) FILTER (WHERE mp.is_winner) AS wins
+        COUNT(mp.match_id) FILTER (WHERE mp.is_winner) AS wins,
+        COALESCE(SUM(mp.cards_eaten), 0) AS total_cards_eaten
       FROM players p
       LEFT JOIN match_players mp ON mp.player_id = p.id
       GROUP BY p.id, p.name
@@ -211,6 +212,7 @@ export const store = {
         playerName: row.name,
         matchesPlayed,
         wins,
+        totalCardsEaten: Number(row.total_cards_eaten),
         winRate: matchesPlayed > 0 ? wins / matchesPlayed : 0,
       }
     })
