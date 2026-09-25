@@ -8,8 +8,17 @@ export interface LeaderboardEntry {
   avgScore: number | null
 }
 
+export interface CardsRecord {
+  playerId: string
+  playerName: string
+  cardsEaten: number
+  matchId: string
+  playedAt: string
+}
+
 export interface LeaderboardState {
   items: LeaderboardEntry[]
+  cardsRecord: CardsRecord | null
   status: 'idle' | 'loading' | 'succeeded' | 'error'
   error: string | null
 }

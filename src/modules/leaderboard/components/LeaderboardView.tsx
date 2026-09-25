@@ -3,9 +3,13 @@ import { useAppDispatch, useAppSelector } from '@/core/store/hooks'
 import { fetchLeaderboard } from '../services/leaderboardSlice'
 import { LeaderboardTable } from './LeaderboardTable'
 
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
 export function LeaderboardView() {
   const dispatch = useAppDispatch()
-  const { items, status, error } = useAppSelector(state => state.leaderboard)
+  const { items, cardsRecord, status, error } = useAppSelector(state => state.leaderboard)
 
   useEffect(() => {
     dispatch(fetchLeaderboard())
@@ -14,6 +18,17 @@ export function LeaderboardView() {
   return (
     <div className="mx-auto flex max-w-lg flex-col gap-4 px-4 py-5">
       <h1 className="font-display text-xl font-bold text-ink">Ranking</h1>
+
+      {cardsRecord && (
+        <div className="rounded-2xl border border-uno-red/40 bg-uno-red/10 px-4 py-3">
+          <p className="text-sm text-ink">
+            🃏 Récord de cartas comidas:{' '}
+            <span className="font-display font-bold text-uno-red-bright">{cardsRecord.playerName}</span>{' '}
+            se comió <span className="font-bold">{cardsRecord.cardsEaten}</span> cartas en una partida
+          </p>
+          <p className="mt-0.5 text-xs text-ink-dim">{formatDate(cardsRecord.playedAt)}</p>
+        </div>
+      )}
 
       {error && (
         <p className="rounded-xl border border-uno-red/40 bg-uno-red/10 px-4 py-2 text-sm text-uno-red-bright">

@@ -1,6 +1,7 @@
 import { apiFetch } from '@/core/api/client'
-import type { LeaderboardEntry } from '../types/leaderboardTypes'
+import type { CardsRecord, LeaderboardEntry } from '../types/leaderboardTypes'
 
 export const leaderboardApi = {
-  get: () => apiFetch<{ leaderboard: LeaderboardEntry[] }>('/leaderboard'),
+  get: () =>
+    apiFetch<{ leaderboard: LeaderboardEntry[]; cardsRecord: CardsRecord | null }>('/leaderboard'),
 }

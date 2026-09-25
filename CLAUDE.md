@@ -78,12 +78,14 @@ desde `@/modules/jugadores`, no desde `@/modules/jugadores/services/jugadoresSli
 - **`players`**: `{id, name, createdAt}`. Nombre único (case-insensitive), validado en
   `server/src/routes/players.js`.
 - **`matches`**: `{id, playedAt, notes, createdAt}` + **`match_players`** (tabla puente):
-  `{matchId, playerId, score, isWinner}`. Una partida tiene N jugadores (mínimo 2); cada uno
-  con un puntaje opcional (nullable — no todas las partidas registran puntos) y exactamente uno
-  marcado `isWinner`. El ganador se marca explícitamente en el formulario de alta, **no se
-  deriva del puntaje** — UNO no tiene una dirección de puntaje fija entre variantes (a veces
-  gana quien suma más, a veces quien suma menos), así que inferirlo sería asumir una regla que
-  no está garantizada.
+  `{matchId, playerId, score, cardsEaten, isWinner}`. Una partida tiene N jugadores (mínimo 2);
+  cada uno con un puntaje opcional y unas cartas comidas opcionales (ambos nullable — no todas
+  las partidas registran esos datos) y exactamente uno marcado `isWinner`. El ganador se marca
+  explícitamente en el formulario de alta, **no se deriva del puntaje** — UNO no tiene una
+  dirección de puntaje fija entre variantes (a veces gana quien suma más, a veces quien suma
+  menos), así que inferirlo sería asumir una regla que no está garantizada. `cards_eaten` se
+  añadió con `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` en `migrate()` (no se recreó la tabla),
+  porque ya había bases desplegadas con el esquema anterior.
 - Borrar un jugador (`ON DELETE CASCADE` en `match_players.player_id`) le borra su fila de las
   partidas donde jugó, pero **no borra la partida en sí** si quedan otros jugadores — el
   historial de los demás participantes se conserva.
@@ -91,7 +93,10 @@ desde `@/modules/jugadores`, no desde `@/modules/jugadores/services/jugadoresSli
   `server/src/db.js` (`store.leaderboard()`) — no hay una tabla de ranking cacheada, se recalcula
   en cada fetch. Ordenado por `wins DESC, matchesPlayed DESC, name ASC` (ver decisión de
   ranking abajo). `avgScore`/`totalScore` se muestran como info adicional en la tabla pero no
-  afectan el orden.
+  afectan el orden. La misma respuesta incluye `cardsRecord` (`store.cardsRecord()`): el
+  jugador que más cartas se comió en una única partida, en todo el historial — no es parte del
+  ranking (no ordena jugadores), es un dato suelto tipo "salón de la fama" que se muestra como
+  banner en `LeaderboardView`.
 
 ### Decisión de ranking
 
