@@ -15,7 +15,6 @@ export function PlayerCard({ player, stats }: Props) {
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(player.name)
   const [confirmOpen, setConfirmOpen] = useState(false)
-  const [expanded, setExpanded] = useState(false)
 
   function startEdit() {
     setName(player.name)
@@ -40,17 +39,6 @@ export function PlayerCard({ player, stats }: Props) {
     <>
       <div className="rounded-2xl border border-rim bg-surface-3">
         <div className="flex items-center gap-3 px-4 py-3">
-          <button
-            onClick={() => setExpanded(v => !v)}
-            aria-label={expanded ? 'Ocultar estadísticas' : 'Ver estadísticas'}
-            className={[
-              'shrink-0 text-sm text-ink-dim transition-transform hover:text-ink',
-              expanded ? 'rotate-90' : '',
-            ].join(' ')}
-          >
-            ▸
-          </button>
-
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-uno-red font-display text-base font-bold text-white">
             {player.name.charAt(0).toUpperCase()}
           </div>
@@ -91,22 +79,20 @@ export function PlayerCard({ player, stats }: Props) {
           </button>
         </div>
 
-        {expanded && (
-          <div className="grid grid-cols-3 gap-2 border-t border-rim px-4 py-3">
-            <div className="flex flex-col items-center gap-0.5">
-              <span className="font-display text-base font-bold text-ink">{matchesPlayed}</span>
-              <span className="text-[11px] uppercase tracking-wide text-ink-dim">Partidas</span>
-            </div>
-            <div className="flex flex-col items-center gap-0.5">
-              <span className="font-display text-base font-bold text-uno-yellow">{wins}</span>
-              <span className="text-[11px] uppercase tracking-wide text-ink-dim">Victorias</span>
-            </div>
-            <div className="flex flex-col items-center gap-0.5">
-              <span className="font-display text-base font-bold text-uno-red-bright">🃏 {cardsEaten}</span>
-              <span className="text-[11px] uppercase tracking-wide text-ink-dim">Comidas</span>
-            </div>
+        <div className="grid grid-cols-3 gap-2 border-t border-rim px-4 py-3">
+          <div className="flex flex-col items-center gap-0.5">
+            <span className="font-display text-base font-bold text-ink">{matchesPlayed}</span>
+            <span className="text-[11px] uppercase tracking-wide text-ink-dim">Partidas</span>
           </div>
-        )}
+          <div className="flex flex-col items-center gap-0.5">
+            <span className="font-display text-base font-bold text-uno-yellow">{wins}</span>
+            <span className="text-[11px] uppercase tracking-wide text-ink-dim">Victorias</span>
+          </div>
+          <div className="flex flex-col items-center gap-0.5">
+            <span className="font-display text-base font-bold text-uno-red-bright">🃏 {cardsEaten}</span>
+            <span className="text-[11px] uppercase tracking-wide text-ink-dim">Comidas</span>
+          </div>
+        </div>
       </div>
 
       <ConfirmModal
