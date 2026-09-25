@@ -4,13 +4,13 @@ import type { LeaderboardState } from '../types/leaderboardTypes'
 
 const initialState: LeaderboardState = {
   items: [],
+  cardsRecord: null,
   status: 'idle',
   error: null,
 }
 
 export const fetchLeaderboard = createAsyncThunk('leaderboard/fetch', async () => {
-  const { leaderboard } = await leaderboardApi.get()
-  return leaderboard
+  return leaderboardApi.get()
 })
 
 const leaderboardSlice = createSlice({
@@ -25,7 +25,8 @@ const leaderboardSlice = createSlice({
       })
       .addCase(fetchLeaderboard.fulfilled, (state, action) => {
         state.status = 'succeeded'
-        state.items = action.payload
+        state.items = action.payload.leaderboard
+        state.cardsRecord = action.payload.cardsRecord
       })
       .addCase(fetchLeaderboard.rejected, state => {
         state.status = 'error'

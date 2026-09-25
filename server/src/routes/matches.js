@@ -22,6 +22,12 @@ function validateMatchPlayers(players) {
     if (entry.score != null && (typeof entry.score !== 'number' || !Number.isFinite(entry.score))) {
       return 'El puntaje debe ser un número.'
     }
+    if (
+      entry.cardsEaten != null &&
+      (typeof entry.cardsEaten !== 'number' || !Number.isFinite(entry.cardsEaten) || entry.cardsEaten < 0)
+    ) {
+      return 'Las cartas comidas deben ser un número igual o mayor que 0.'
+    }
     if (entry.isWinner) winners += 1
   }
   if (winners !== 1) {
@@ -59,6 +65,7 @@ matchesRouter.post(
       players: players.map(p => ({
         playerId: p.playerId,
         score: p.score ?? null,
+        cardsEaten: p.cardsEaten ?? null,
         isWinner: !!p.isWinner,
       })),
     })

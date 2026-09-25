@@ -9,17 +9,26 @@ interface Props {
 }
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('es-AR', {
+  return new Date(iso).toLocaleDateString('es-ES', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
   })
 }
 
+function topEater(match: Match) {
+  return match.players.reduce<Match['players'][number] | null>((top, p) => {
+    if (p.cardsEaten == null || p.cardsEaten <= 0) return top
+    if (!top || p.cardsEaten > (top.cardsEaten ?? 0)) return p
+    return top
+  }, null)
+}
+
 export function MatchCard({ match }: Props) {
   const dispatch = useAppDispatch()
   const [confirmOpen, setConfirmOpen] = useState(false)
   const winner = match.players.find(p => p.isWinner)
+  const eater = topEater(match)
 
   return (
     <>
@@ -40,6 +49,12 @@ export function MatchCard({ match }: Props) {
           </p>
         )}
 
+        {eater && (
+          <p className="mt-0.5 flex items-center gap-1.5 text-xs text-uno-red-bright">
+            🃏 {eater.playerName} se comió {eater.cardsEaten} cartas
+          </p>
+        )}
+
         <div className="mt-2 flex flex-wrap gap-1.5">
           {match.players.map(p => (
             <span
@@ -52,7 +67,8 @@ export function MatchCard({ match }: Props) {
               ].join(' ')}
             >
               {p.playerName}
-              {p.score != null ? ` · ${p.score}` : ''}
+              {p.score != null ? ` · ${p.score} pts` : ''}
+              {p.cardsEaten != null ? ` · 🃏${p.cardsEaten}` : ''}
             </span>
           ))}
         </div>

@@ -30,7 +30,7 @@ export function JugadoresView() {
 
       {status !== 'loading' && items.length === 0 && (
         <p className="rounded-2xl border border-dashed border-rim px-4 py-8 text-center text-sm text-ink-dim">
-          Todavía no hay jugadores. Añadí el primero arriba.
+          Todavía no hay jugadores. Añade el primero arriba.
         </p>
       )}
 

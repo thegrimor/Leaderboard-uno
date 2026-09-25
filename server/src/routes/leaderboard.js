@@ -7,7 +7,7 @@ export const leaderboardRouter = Router()
 leaderboardRouter.get(
   '/',
   asyncHandler(async (_req, res) => {
-    const leaderboard = await store.leaderboard()
-    res.json({ leaderboard })
+    const [leaderboard, cardsRecord] = await Promise.all([store.leaderboard(), store.cardsRecord()])
+    res.json({ leaderboard, cardsRecord })
   }),
 )

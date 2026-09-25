@@ -55,6 +55,9 @@ async function migrate() {
       PRIMARY KEY (match_id, player_id)
     );
   `)
+  // Añadida después de la primera versión del esquema — ADD COLUMN IF NOT EXISTS para no
+  // romper una base ya desplegada donde match_players ya existía sin esta columna.
+  await pool.query('ALTER TABLE match_players ADD COLUMN IF NOT EXISTS cards_eaten INTEGER;')
   await pool.query(
     'CREATE INDEX IF NOT EXISTS match_players_player_id_idx ON match_players (player_id);',
   )
@@ -99,6 +102,7 @@ const MATCH_SELECT = `
           'playerId', mp.player_id,
           'playerName', p.name,
           'score', mp.score,
+          'cardsEaten', mp.cards_eaten,
           'isWinner', mp.is_winner
         ) ORDER BY mp.is_winner DESC, p.name ASC
       ) FILTER (WHERE mp.player_id IS NOT NULL),
@@ -169,8 +173,8 @@ export const store = {
       )
       for (const player of match.players) {
         await client.query(
-          'INSERT INTO match_players (match_id, player_id, score, is_winner) VALUES ($1, $2, $3, $4)',
-          [match.id, player.playerId, player.score ?? null, player.isWinner],
+          'INSERT INTO match_players (match_id, player_id, score, is_winner, cards_eaten) VALUES ($1, $2, $3, $4, $5)',
+          [match.id, player.playerId, player.score ?? null, player.isWinner, player.cardsEaten ?? null],
         )
       }
       await client.query('COMMIT')
@@ -215,5 +219,28 @@ export const store = {
         avgScore: scoredMatches > 0 ? totalScore / scoredMatches : null,
       }
     })
+  },
+
+  // Récord absoluto: quién se comió más cartas en una única partida, y en cuál. No es una
+  // métrica de ranking (no ordena a los jugadores), es un dato suelto tipo "salón de la fama".
+  async cardsRecord() {
+    const { rows } = await pool.query(`
+      SELECT mp.player_id, p.name, mp.cards_eaten, mp.match_id, m.played_at
+      FROM match_players mp
+      JOIN players p ON p.id = mp.player_id
+      JOIN matches m ON m.id = mp.match_id
+      WHERE mp.cards_eaten IS NOT NULL
+      ORDER BY mp.cards_eaten DESC, m.played_at DESC
+      LIMIT 1
+    `)
+    const row = rows[0]
+    if (!row) return null
+    return {
+      playerId: row.player_id,
+      playerName: row.name,
+      cardsEaten: Number(row.cards_eaten),
+      matchId: row.match_id,
+      playedAt: row.played_at instanceof Date ? row.played_at.toISOString() : row.played_at,
+    }
   },
 }

@@ -17,6 +17,7 @@ export function AddMatchModal({ onClose }: Props) {
 
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [scores, setScores] = useState<Record<string, string>>({})
+  const [cardsEaten, setCardsEaten] = useState<Record<string, string>>({})
   const [winnerId, setWinnerId] = useState<string | null>(null)
   const [playedAt, setPlayedAt] = useState(todayInputValue)
   const [notes, setNotes] = useState('')
@@ -41,11 +42,11 @@ export function AddMatchModal({ onClose }: Props) {
     setFormError(null)
 
     if (selected.size < 2) {
-      setFormError('Elegí al menos 2 jugadores.')
+      setFormError('Elige al menos 2 jugadores.')
       return
     }
     if (!winnerId || !selected.has(winnerId)) {
-      setFormError('Marcá quién ganó la partida.')
+      setFormError('Marca quién ganó la partida.')
       return
     }
 
@@ -57,6 +58,7 @@ export function AddMatchModal({ onClose }: Props) {
         players: Array.from(selected).map(playerId => ({
           playerId,
           score: scores[playerId]?.trim() ? Number(scores[playerId]) : null,
+          cardsEaten: cardsEaten[playerId]?.trim() ? Number(cardsEaten[playerId]) : null,
           isWinner: playerId === winnerId,
         })),
       }),
@@ -111,7 +113,7 @@ export function AddMatchModal({ onClose }: Props) {
               </span>
               {players.length === 0 ? (
                 <p className="rounded-xl border border-dashed border-rim px-3 py-4 text-sm text-ink-dim">
-                  Todavía no hay jugadores cargados. Andá a la pestaña Jugadores para añadir alguno.
+                  Todavía no hay jugadores cargados. Ve a la pestaña Jugadores para añadir alguno.
                 </p>
               ) : (
                 <div className="flex flex-wrap gap-2">
@@ -140,34 +142,49 @@ export function AddMatchModal({ onClose }: Props) {
             {selected.size > 0 && (
               <div className="flex flex-col gap-2">
                 <span className="text-xs font-medium uppercase tracking-wide text-ink-dim">
-                  Puntaje y ganador
+                  Puntaje, cartas comidas y ganador
                 </span>
                 <div className="flex flex-col divide-y divide-rim overflow-hidden rounded-xl border border-rim">
                   {players
                     .filter(p => selected.has(p.id))
                     .map(player => (
-                      <div key={player.id} className="flex items-center gap-3 bg-surface-4 px-3 py-2.5">
-                        <span className="min-w-0 flex-1 truncate text-sm text-ink">{player.name}</span>
-                        <input
-                          type="number"
-                          inputMode="numeric"
-                          placeholder="Puntos"
-                          value={scores[player.id] ?? ''}
-                          onChange={e =>
-                            setScores(prev => ({ ...prev, [player.id]: e.target.value }))
-                          }
-                          className="w-20 rounded-lg border border-rim bg-surface-3 px-2 py-1.5 text-sm text-ink focus:border-rim-2 focus:outline-none"
-                        />
-                        <label className="flex items-center gap-1.5 text-xs text-ink-dim">
+                      <div key={player.id} className="flex flex-col gap-2 bg-surface-4 px-3 py-2.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="min-w-0 flex-1 truncate text-sm text-ink">{player.name}</span>
+                          <label className="flex items-center gap-1.5 text-xs text-ink-dim">
+                            <input
+                              type="radio"
+                              name="winner"
+                              checked={winnerId === player.id}
+                              onChange={() => setWinnerId(player.id)}
+                              className="accent-uno-yellow"
+                            />
+                            Ganó
+                          </label>
+                        </div>
+                        <div className="flex items-center gap-2">
                           <input
-                            type="radio"
-                            name="winner"
-                            checked={winnerId === player.id}
-                            onChange={() => setWinnerId(player.id)}
-                            className="accent-uno-yellow"
+                            type="number"
+                            inputMode="numeric"
+                            placeholder="Puntos"
+                            value={scores[player.id] ?? ''}
+                            onChange={e =>
+                              setScores(prev => ({ ...prev, [player.id]: e.target.value }))
+                            }
+                            className="w-0 flex-1 rounded-lg border border-rim bg-surface-3 px-2 py-1.5 text-sm text-ink focus:border-rim-2 focus:outline-none"
                           />
-                          Ganó
-                        </label>
+                          <input
+                            type="number"
+                            inputMode="numeric"
+                            min={0}
+                            placeholder="🃏 Comidas"
+                            value={cardsEaten[player.id] ?? ''}
+                            onChange={e =>
+                              setCardsEaten(prev => ({ ...prev, [player.id]: e.target.value }))
+                            }
+                            className="w-0 flex-1 rounded-lg border border-rim bg-surface-3 px-2 py-1.5 text-sm text-ink focus:border-rim-2 focus:outline-none"
+                          />
+                        </div>
                       </div>
                     ))}
                 </div>
