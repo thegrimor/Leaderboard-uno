@@ -41,11 +41,11 @@ export function AddMatchModal({ onClose }: Props) {
     setFormError(null)
 
     if (selected.size < 2) {
-      setFormError('Elegí al menos 2 jugadores.')
+      setFormError('Elige al menos 2 jugadores.')
       return
     }
     if (!winnerId || !selected.has(winnerId)) {
-      setFormError('Marcá quién ganó la partida.')
+      setFormError('Marca quién ganó la partida.')
       return
     }
 
@@ -111,7 +111,7 @@ export function AddMatchModal({ onClose }: Props) {
               </span>
               {players.length === 0 ? (
                 <p className="rounded-xl border border-dashed border-rim px-3 py-4 text-sm text-ink-dim">
-                  Todavía no hay jugadores cargados. Andá a la pestaña Jugadores para añadir alguno.
+                  Todavía no hay jugadores cargados. Ve a la pestaña Jugadores para añadir alguno.
                 </p>
               ) : (
                 <div className="flex flex-wrap gap-2">
