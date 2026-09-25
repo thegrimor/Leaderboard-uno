@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+/* ============================================================
+   THEME — Design system del Leaderboard UNO
+   ============================================================ */
+@theme {
+  /* Colores de marca (paleta de las cartas UNO) */
+  --color-uno-red: #e8412c;
+  --color-uno-red-bright: #ff5a3d;
+  --color-uno-yellow: #f5b722;
+  --color-uno-green: #1f9e5c;
+  --color-uno-blue: #1f6fd6;
+
+  /* Superficies */
+  --color-surface: #0d0f14;
+  --color-surface-2: #12151c;
+  --color-surface-3: #191d27;
+  --color-surface-4: #232837;
+
+  /* Texto */
+  --color-ink: #f2f0ea;
+  --color-ink-dim: #9aa0ad;
+
+  /* Bordes */
+  --color-rim: #262b38;
+  --color-rim-2: #3a4258;
+
+  /* Tipografías */
+  --font-display: 'Poppins', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Animaciones */
+  --animate-pop: pop 0.18s ease-out;
+}
+
+@keyframes pop {
+  0% { transform: scale(0.96); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    min-height: 100dvh;
+  }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  input, select, textarea {
+    font-family: inherit;
+  }
+}
