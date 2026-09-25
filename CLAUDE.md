@@ -36,8 +36,8 @@ src/
   modules/
     jugadores/
       components/        # JugadoresView, AddPlayerForm, PlayerCard (siempre muestra sus
-                          # estadísticas — partidas/victorias/cartas comidas — leídas de
-                          # `leaderboard.items` vía `stats?: LeaderboardEntry`, sin desplegable)
+                          # estadísticas — partidas/victorias/% winrate/cartas comidas —
+                          # leídas de `leaderboard.items` vía `stats?: LeaderboardEntry`)
       services/           # jugadoresApi.ts (fetch al backend), jugadoresSlice.ts (thunks)
       types/               # Player, JugadoresState
       index.ts             # barrel export

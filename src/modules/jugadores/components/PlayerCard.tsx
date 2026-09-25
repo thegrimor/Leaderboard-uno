@@ -34,6 +34,7 @@ export function PlayerCard({ player, stats }: Props) {
   const matchesPlayed = stats?.matchesPlayed ?? 0
   const wins = stats?.wins ?? 0
   const cardsEaten = stats?.totalCardsEaten ?? 0
+  const winRate = stats?.winRate ?? 0
 
   return (
     <>
@@ -79,7 +80,7 @@ export function PlayerCard({ player, stats }: Props) {
           </button>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 border-t border-rim px-4 py-3">
+        <div className="grid grid-cols-4 gap-2 border-t border-rim px-4 py-3">
           <div className="flex flex-col items-center gap-0.5">
             <span className="font-display text-base font-bold text-ink">{matchesPlayed}</span>
             <span className="text-[11px] uppercase tracking-wide text-ink-dim">Partidas</span>
@@ -87,6 +88,10 @@ export function PlayerCard({ player, stats }: Props) {
           <div className="flex flex-col items-center gap-0.5">
             <span className="font-display text-base font-bold text-uno-yellow">{wins}</span>
             <span className="text-[11px] uppercase tracking-wide text-ink-dim">Victorias</span>
+          </div>
+          <div className="flex flex-col items-center gap-0.5">
+            <span className="font-display text-base font-bold text-uno-green">{(winRate * 100).toFixed(0)}%</span>
+            <span className="text-[11px] uppercase tracking-wide text-ink-dim">Winrate</span>
           </div>
           <div className="flex flex-col items-center gap-0.5">
             <span className="font-display text-base font-bold text-uno-red-bright">🃏 {cardsEaten}</span>
