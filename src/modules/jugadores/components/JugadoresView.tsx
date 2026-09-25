@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '@/core/store/hooks'
+import { fetchLeaderboard } from '@/modules/leaderboard'
 import { fetchPlayers } from '../services/jugadoresSlice'
 import { AddPlayerForm } from './AddPlayerForm'
 import { PlayerCard } from './PlayerCard'
@@ -7,9 +8,11 @@ import { PlayerCard } from './PlayerCard'
 export function JugadoresView() {
   const dispatch = useAppDispatch()
   const { items, status, error } = useAppSelector(state => state.jugadores)
+  const leaderboardItems = useAppSelector(state => state.leaderboard.items)
 
   useEffect(() => {
     dispatch(fetchPlayers())
+    dispatch(fetchLeaderboard())
   }, [dispatch])
 
   return (
@@ -36,7 +39,11 @@ export function JugadoresView() {
 
       <div className="flex flex-col gap-2">
         {items.map(player => (
-          <PlayerCard key={player.id} player={player} />
+          <PlayerCard
+            key={player.id}
+            player={player}
+            stats={leaderboardItems.find(entry => entry.playerId === player.id)}
+          />
         ))}
       </div>
     </div>
