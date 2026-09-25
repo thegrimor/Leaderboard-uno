@@ -4,8 +4,6 @@ export interface LeaderboardEntry {
   matchesPlayed: number
   wins: number
   winRate: number
-  totalScore: number
-  avgScore: number | null
 }
 
 export interface CardsRecord {

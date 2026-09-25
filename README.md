@@ -1,4 +1,4 @@
-# Leaderboard UNO
+# UNO Office Edition
 
 App para llevar el registro de partidas de UNO de un grupo: jugadores, historial de partidas y
 un ranking por victorias.

@@ -81,5 +81,5 @@ app.use((err, _req, res, _next) => {
 await dbReady
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Leaderboard UNO server escuchando en http://localhost:${PORT}`)
+  console.log(`UNO Office Edition server escuchando en http://localhost:${PORT}`)
 })

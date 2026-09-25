@@ -1,7 +1,6 @@
 export interface MatchPlayerEntry {
   playerId: string
   playerName: string
-  score: number | null
   cardsEaten: number | null
   isWinner: boolean
 }
@@ -16,7 +15,6 @@ export interface Match {
 
 export interface NewMatchPlayerInput {
   playerId: string
-  score: number | null
   cardsEaten: number | null
   isWinner: boolean
 }
