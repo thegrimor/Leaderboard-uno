@@ -20,7 +20,7 @@ export default function App() {
       <header className="sticky top-0 z-20 border-b border-rim bg-surface-2">
         <div className="mx-auto flex max-w-lg items-center gap-2 px-4 py-3">
           <span className="text-xl">🃏</span>
-          <span className="font-display text-base font-bold text-ink">Leaderboard UNO</span>
+          <span className="font-display text-base font-bold text-ink">UNO Office Edition</span>
         </div>
       </header>
 

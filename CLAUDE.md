@@ -1,4 +1,4 @@
-# CLAUDE.md — Leaderboard UNO
+# CLAUDE.md — UNO Office Edition
 
 Reglas y convenciones para el agente en este proyecto.
 
@@ -40,8 +40,9 @@ src/
       types/               # Player, JugadoresState
       index.ts             # barrel export
     partidas/
-      components/         # PartidasView, AddMatchModal (alta con N jugadores + puntaje +
-                            # ganador), MatchCard
+      components/         # PartidasView (con filtro de fechas Desde/Hasta, client-side sobre
+                            # los datos ya cargados), AddMatchModal (alta con N jugadores +
+                            # cartas comidas + ganador), MatchCard
       services/            # partidasApi.ts, partidasSlice.ts
       types/                 # Match, MatchPlayerEntry, NewMatchInput
       index.ts
@@ -78,33 +79,36 @@ desde `@/modules/jugadores`, no desde `@/modules/jugadores/services/jugadoresSli
 - **`players`**: `{id, name, createdAt}`. Nombre único (case-insensitive), validado en
   `server/src/routes/players.js`.
 - **`matches`**: `{id, playedAt, notes, createdAt}` + **`match_players`** (tabla puente):
-  `{matchId, playerId, score, cardsEaten, isWinner}`. Una partida tiene N jugadores (mínimo 2);
-  cada uno con un puntaje opcional y unas cartas comidas opcionales (ambos nullable — no todas
-  las partidas registran esos datos) y exactamente uno marcado `isWinner`. El ganador se marca
-  explícitamente en el formulario de alta, **no se deriva del puntaje** — UNO no tiene una
-  dirección de puntaje fija entre variantes (a veces gana quien suma más, a veces quien suma
-  menos), así que inferirlo sería asumir una regla que no está garantizada. `cards_eaten` se
-  añadió con `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` en `migrate()` (no se recreó la tabla),
-  porque ya había bases desplegadas con el esquema anterior.
+  `{matchId, playerId, cardsEaten, isWinner}`. Una partida tiene N jugadores (mínimo 2); cada
+  uno con unas cartas comidas opcionales (nullable — no todas las partidas lo registran) y
+  exactamente uno marcado `isWinner`. El ganador se marca explícitamente en el formulario de
+  alta, nunca derivado de otro dato. `cards_eaten` se añadió con
+  `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` en `migrate()` (no se recreó la tabla), porque ya
+  había bases desplegadas con el esquema anterior.
+- La tabla `match_players` todavía tiene una columna `score` en Postgres (de una versión
+  anterior de la app que sí guardaba puntaje) — **deliberadamente sin `DROP`**, para no perder
+  los puntajes de partidas reales ya guardadas en producción. La app ya no la lee ni la escribe
+  (no está en `MATCH_SELECT`, ni en el `INSERT` de `createMatch`, ni en `leaderboard()`); es un
+  campo muerto a nivel de aplicación, solo persiste como dato histórico en la base.
 - Borrar un jugador (`ON DELETE CASCADE` en `match_players.player_id`) le borra su fila de las
   partidas donde jugó, pero **no borra la partida en sí** si quedan otros jugadores — el
   historial de los demás participantes se conserva.
 - El ranking (`GET /api/leaderboard`) se calcula con una sola query de agregación SQL en
   `server/src/db.js` (`store.leaderboard()`) — no hay una tabla de ranking cacheada, se recalcula
   en cada fetch. Ordenado por `wins DESC, matchesPlayed DESC, name ASC` (ver decisión de
-  ranking abajo). `avgScore`/`totalScore` se muestran como info adicional en la tabla pero no
-  afectan el orden. La misma respuesta incluye `cardsRecord` (`store.cardsRecord()`): el
-  jugador que más cartas se comió en una única partida, en todo el historial — no es parte del
-  ranking (no ordena jugadores), es un dato suelto tipo "salón de la fama" que se muestra como
-  banner en `LeaderboardView`.
+  ranking abajo). La misma respuesta incluye `cardsRecord` (`store.cardsRecord()`): el jugador
+  que más cartas se comió en una única partida, en todo el historial — no es parte del ranking
+  (no ordena jugadores), es un dato suelto tipo "salón de la fama" que se muestra como banner en
+  `LeaderboardView`.
 
 ### Decisión de ranking
 
 Se eligió ordenar por **victorias absolutas** (con % de victorias como columna secundaria), no
 por Elo ni por puntaje acumulado — más simple de calcular y de entender para un grupo chico de
-amigos. Si en el futuro se quiere cambiar a otra métrica, el único lugar que toca tocar es
-`store.leaderboard()` en `server/src/db.js` (la query SQL) — el frontend simplemente renderiza
-lo que venga en `LeaderboardEntry[]`.
+amigos. La app deliberadamente no guarda puntaje por partida (ver nota sobre la columna `score`
+muerta arriba): solo victoria/derrota y cartas comidas. Si en el futuro se quiere cambiar la
+métrica de ranking, el único lugar que toca tocar es `store.leaderboard()` en `server/src/db.js`
+(la query SQL) — el frontend simplemente renderiza lo que venga en `LeaderboardEntry[]`.
 
 ## Diseño — Mobile First
 

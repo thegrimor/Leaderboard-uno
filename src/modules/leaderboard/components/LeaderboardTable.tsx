@@ -22,7 +22,6 @@ export function LeaderboardTable({ entries }: Props) {
             <p className="truncate text-sm font-semibold text-ink">{entry.playerName}</p>
             <p className="text-xs text-ink-dim">
               {entry.matchesPlayed} {entry.matchesPlayed === 1 ? 'partida' : 'partidas'}
-              {entry.avgScore != null ? ` · ${entry.avgScore.toFixed(1)} pts prom.` : ''}
             </p>
           </div>
 

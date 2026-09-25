@@ -16,7 +16,6 @@ export function AddMatchModal({ onClose }: Props) {
   const players = useAppSelector(state => state.jugadores.items)
 
   const [selected, setSelected] = useState<Set<string>>(new Set())
-  const [scores, setScores] = useState<Record<string, string>>({})
   const [cardsEaten, setCardsEaten] = useState<Record<string, string>>({})
   const [winnerId, setWinnerId] = useState<string | null>(null)
   const [playedAt, setPlayedAt] = useState(todayInputValue)
@@ -57,7 +56,6 @@ export function AddMatchModal({ onClose }: Props) {
         notes: notes.trim() || undefined,
         players: Array.from(selected).map(playerId => ({
           playerId,
-          score: scores[playerId]?.trim() ? Number(scores[playerId]) : null,
           cardsEaten: cardsEaten[playerId]?.trim() ? Number(cardsEaten[playerId]) : null,
           isWinner: playerId === winnerId,
         })),
@@ -142,49 +140,35 @@ export function AddMatchModal({ onClose }: Props) {
             {selected.size > 0 && (
               <div className="flex flex-col gap-2">
                 <span className="text-xs font-medium uppercase tracking-wide text-ink-dim">
-                  Puntaje, cartas comidas y ganador
+                  Cartas comidas y ganador
                 </span>
                 <div className="flex flex-col divide-y divide-rim overflow-hidden rounded-xl border border-rim">
                   {players
                     .filter(p => selected.has(p.id))
                     .map(player => (
-                      <div key={player.id} className="flex flex-col gap-2 bg-surface-4 px-3 py-2.5">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="min-w-0 flex-1 truncate text-sm text-ink">{player.name}</span>
-                          <label className="flex items-center gap-1.5 text-xs text-ink-dim">
-                            <input
-                              type="radio"
-                              name="winner"
-                              checked={winnerId === player.id}
-                              onChange={() => setWinnerId(player.id)}
-                              className="accent-uno-yellow"
-                            />
-                            Ganó
-                          </label>
-                        </div>
-                        <div className="flex items-center gap-2">
+                      <div key={player.id} className="flex items-center gap-3 bg-surface-4 px-3 py-2.5">
+                        <span className="min-w-0 flex-1 truncate text-sm text-ink">{player.name}</span>
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          min={0}
+                          placeholder="🃏 Comidas"
+                          value={cardsEaten[player.id] ?? ''}
+                          onChange={e =>
+                            setCardsEaten(prev => ({ ...prev, [player.id]: e.target.value }))
+                          }
+                          className="w-24 rounded-lg border border-rim bg-surface-3 px-2 py-1.5 text-sm text-ink focus:border-rim-2 focus:outline-none"
+                        />
+                        <label className="flex items-center gap-1.5 text-xs text-ink-dim">
                           <input
-                            type="number"
-                            inputMode="numeric"
-                            placeholder="Puntos"
-                            value={scores[player.id] ?? ''}
-                            onChange={e =>
-                              setScores(prev => ({ ...prev, [player.id]: e.target.value }))
-                            }
-                            className="w-0 flex-1 rounded-lg border border-rim bg-surface-3 px-2 py-1.5 text-sm text-ink focus:border-rim-2 focus:outline-none"
+                            type="radio"
+                            name="winner"
+                            checked={winnerId === player.id}
+                            onChange={() => setWinnerId(player.id)}
+                            className="accent-uno-yellow"
                           />
-                          <input
-                            type="number"
-                            inputMode="numeric"
-                            min={0}
-                            placeholder="🃏 Comidas"
-                            value={cardsEaten[player.id] ?? ''}
-                            onChange={e =>
-                              setCardsEaten(prev => ({ ...prev, [player.id]: e.target.value }))
-                            }
-                            className="w-0 flex-1 rounded-lg border border-rim bg-surface-3 px-2 py-1.5 text-sm text-ink focus:border-rim-2 focus:outline-none"
-                          />
-                        </div>
+                          Ganó
+                        </label>
                       </div>
                     ))}
                 </div>

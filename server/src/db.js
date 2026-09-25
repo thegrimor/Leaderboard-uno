@@ -51,6 +51,8 @@ async function migrate() {
       match_id TEXT NOT NULL REFERENCES matches(id) ON DELETE CASCADE,
       player_id TEXT NOT NULL REFERENCES players(id) ON DELETE CASCADE,
       score INTEGER,
+      -- La app ya no usa esta columna (ver "Decisión de ranking" en CLAUDE.md) — se deja sin
+      -- DROP para no perder los puntajes ya guardados en partidas reales de producción.
       is_winner BOOLEAN NOT NULL DEFAULT false,
       PRIMARY KEY (match_id, player_id)
     );
@@ -101,7 +103,6 @@ const MATCH_SELECT = `
         json_build_object(
           'playerId', mp.player_id,
           'playerName', p.name,
-          'score', mp.score,
           'cardsEaten', mp.cards_eaten,
           'isWinner', mp.is_winner
         ) ORDER BY mp.is_winner DESC, p.name ASC
@@ -173,8 +174,8 @@ export const store = {
       )
       for (const player of match.players) {
         await client.query(
-          'INSERT INTO match_players (match_id, player_id, score, is_winner, cards_eaten) VALUES ($1, $2, $3, $4, $5)',
-          [match.id, player.playerId, player.score ?? null, player.isWinner, player.cardsEaten ?? null],
+          'INSERT INTO match_players (match_id, player_id, is_winner, cards_eaten) VALUES ($1, $2, $3, $4)',
+          [match.id, player.playerId, player.isWinner, player.cardsEaten ?? null],
         )
       }
       await client.query('COMMIT')
@@ -196,9 +197,7 @@ export const store = {
     const { rows } = await pool.query(`
       SELECT p.id AS player_id, p.name,
         COUNT(mp.match_id) AS matches_played,
-        COUNT(mp.match_id) FILTER (WHERE mp.is_winner) AS wins,
-        COALESCE(SUM(mp.score), 0) AS total_score,
-        COUNT(mp.score) AS scored_matches
+        COUNT(mp.match_id) FILTER (WHERE mp.is_winner) AS wins
       FROM players p
       LEFT JOIN match_players mp ON mp.player_id = p.id
       GROUP BY p.id, p.name
@@ -207,16 +206,12 @@ export const store = {
     return rows.map(row => {
       const matchesPlayed = Number(row.matches_played)
       const wins = Number(row.wins)
-      const scoredMatches = Number(row.scored_matches)
-      const totalScore = Number(row.total_score)
       return {
         playerId: row.player_id,
         playerName: row.name,
         matchesPlayed,
         wins,
         winRate: matchesPlayed > 0 ? wins / matchesPlayed : 0,
-        totalScore,
-        avgScore: scoredMatches > 0 ? totalScore / scoredMatches : null,
       }
     })
   },

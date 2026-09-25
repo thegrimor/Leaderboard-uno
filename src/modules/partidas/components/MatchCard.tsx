@@ -67,7 +67,6 @@ export function MatchCard({ match }: Props) {
               ].join(' ')}
             >
               {p.playerName}
-              {p.score != null ? ` · ${p.score} pts` : ''}
               {p.cardsEaten != null ? ` · 🃏${p.cardsEaten}` : ''}
             </span>
           ))}
